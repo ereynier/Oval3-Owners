@@ -1,0 +1,22 @@
+{
+  "name": "oval3-viewer-owners",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@prisma/client": "^5.10.1",
+    "@types/node": "^20.11.19",
+    "prisma": "^5.10.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "viem": "^2.7.11"
+  }
+}
