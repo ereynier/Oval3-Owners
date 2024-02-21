@@ -30,23 +30,18 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/github_username/repo_name">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
-  </a>
 
-<h3 align="center">project_title</h3>
+<h3 align="center">Oval3 Owners</h3>
 
   <p align="center">
-    project_description
+    Oval3 Owners is a project consisting of two scripts that read and listen to the blockchain to retrieve the owners of the OVAL3 NFTs and store them in a database, which then feeds into <a href="https://github.com/ereynier/Oval3-Viewer">Oval3-Viewer</a>.
     <br />
-    <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/ereynier/Oval3-Owners"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/github_username/repo_name">View Demo</a>
+    <a href="https://github.com/ereynier/Oval3-Owners/issues">Report Bug</a>
     ·
-    <a href="https://github.com/github_username/repo_name/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/github_username/repo_name/issues">Request Feature</a>
+    <a href="https://github.com/ereynier/Oval3-Owners/issues">Request Feature</a>
   </p>
 </div>
 
@@ -83,24 +78,14 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description`
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
 
 ### Built With
 
-* [![Next][Next.js]][Next-url]
-* [![React][React.js]][React-url]
-* [![Vue][Vue.js]][Vue-url]
-* [![Angular][Angular.io]][Angular-url]
-* [![Svelte][Svelte.dev]][Svelte-url]
-* [![Laravel][Laravel.com]][Laravel-url]
-* [![Bootstrap][Bootstrap.com]][Bootstrap-url]
-* [![JQuery][JQuery.com]][JQuery-url]
+* [![Typescript][Typescript]][Typescript-url]
+* [![Prisma][Prisma.io]][Prisma-url]
+* [![PostgreSQL][PostgreSQL]][PostgreSQL-url]
+* [![Viem][Viem.sh]][Viem-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -109,32 +94,36 @@ Here's a blank template to get started: To avoid retyping too much info. Do a se
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
 To get a local copy up and running follow these simple example steps.
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+package manager:
+ * pnpm: follow the instructions at [https://pnpm.io/fr/installation](https://pnpm.io/fr/installation)
 
 ### Installation
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
+1. Clone the repo
    ```sh
-   git clone https://github.com/github_username/repo_name.git
+   git clone https://github.com/ereynier/Oval3-Owners.git
    ```
-3. Install NPM packages
+2. Install NPM packages
    ```sh
-   npm install
+   pnpm install
    ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
+3. Fill the `.env` file based on the `.env.example` file
+
+4. Run the script
+   ```sh
+   cd scripts
+   ts-node GetOwners.ts
    ```
+
+5. Run the listener in parallel
+   ```sh
+    cd scripts
+    ts-node ListenOwners.ts
+    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -143,9 +132,17 @@ This is an example of how to list things you need to use the software and how to
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+`GetOwners.ts` use the `ownerOf` function from the smart contract to retrieves the owners of each OVAL3 NFTs and stores them in the database.
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+`ListenOwners.ts` listens to the blockchain for the `Transfer` event of the smart contract and updates the database accordingly.
+
+You need to run `GetOwners.ts` once to fill the database and run `ListenOwners.ts` in parallel to keep it up to date. The `GetOwners.ts` script will stop when it reaches the last NFT, and the `ListenOwners.ts` script will keep running until you stop it.
+
+`ListenOwners.ts` will log the events it catches in `logs/transfers.log`.
+
+Known issues:
+- The scripts can interfere with each other while they are running at the same time if the token `GetOwners.ts` is currently processing is transferred. It's not very likely to happen, but it's possible. However the error is not very important, and will be fixed if the card is transferred again later.
+- If `ListenOwners.ts` is stopped and restarted, it will not be able to catch up with the missed events. You will need to run `RecoverTransfer.ts` to fill the missing events in the database.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -154,12 +151,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 <!-- ROADMAP -->
 ## Roadmap
 
-- [ ] Feature 1
-- [ ] Feature 2
-- [ ] Feature 3
-    - [ ] Nested Feature
-
-See the [open issues](https://github.com/github_username/repo_name/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/ereynier/Oval3-Owners/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -195,9 +187,9 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com
+Estéban Reynier - [@EstebanReynier](https://twitter.com/EstebanReynier) - esteban@ereynier.me
 
-Project Link: [https://github.com/github_username/repo_name](https://github.com/github_username/repo_name)
+Project Link: [https://github.com/ereynier/Oval3-Owners](https://github.com/ereynier/Oval3-Owners)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -206,9 +198,11 @@ Project Link: [https://github.com/github_username/repo_name](https://github.com/
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* []()
-* []()
-* []()
+* [Oval3 game](https://oval3.game)
+* [Viem.sh](https://viem.sh)
+* [Prisma.io](https://www.prisma.io/)
+* [PostgreSQL](https://www.postgresql.org/)
+* [Typescript](https://www.typescriptlang.org/)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -216,32 +210,25 @@ Project Link: [https://github.com/github_username/repo_name](https://github.com/
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/github_username/repo_name.svg?style=for-the-badge
-[contributors-url]: https://github.com/github_username/repo_name/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/github_username/repo_name.svg?style=for-the-badge
-[forks-url]: https://github.com/github_username/repo_name/network/members
-[stars-shield]: https://img.shields.io/github/stars/github_username/repo_name.svg?style=for-the-badge
-[stars-url]: https://github.com/github_username/repo_name/stargazers
-[issues-shield]: https://img.shields.io/github/issues/github_username/repo_name.svg?style=for-the-badge
-[issues-url]: https://github.com/github_username/repo_name/issues
-[license-shield]: https://img.shields.io/github/license/github_username/repo_name.svg?style=for-the-badge
-[license-url]: https://github.com/github_username/repo_name/blob/master/LICENSE.txt
+[contributors-shield]: https://img.shields.io/github/contributors/ereynier/Oval3-Owners.svg?style=for-the-badge
+[contributors-url]: https://github.com/ereynier/Oval3-Owners/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/ereynier/Oval3-Owners.svg?style=for-the-badge
+[forks-url]: https://github.com/ereynier/Oval3-Owners/network/members
+[stars-shield]: https://img.shields.io/github/stars/ereynier/Oval3-Owners.svg?style=for-the-badge
+[stars-url]: https://github.com/ereynier/Oval3-Owners/stargazers
+[issues-shield]: https://img.shields.io/github/issues/ereynier/Oval3-Owners.svg?style=for-the-badge
+[issues-url]: https://github.com/ereynier/Oval3-Owners/issues
+[license-shield]: https://img.shields.io/github/license/ereynier/Oval3-Owners.svg?style=for-the-badge
+[license-url]: https://github.com/ereynier/Oval3-Owners/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/linkedin_username
+[linkedin-url]: https://linkedin.com/in/ereynier
 [product-screenshot]: images/screenshot.png
 [Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
-[Next-url]: https://nextjs.org/
-[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
-[React-url]: https://reactjs.org/
-[Vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
-[Vue-url]: https://vuejs.org/
-[Angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
-[Angular-url]: https://angular.io/
-[Svelte.dev]: https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte&logoColor=FF3E00
-[Svelte-url]: https://svelte.dev/
-[Laravel.com]: https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white
-[Laravel-url]: https://laravel.com
-[Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
-[Bootstrap-url]: https://getbootstrap.com
-[JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
-[JQuery-url]: https://jquery.com 
+[Viem.sh]: https://img.shields.io/badge/Viem-000000?style=for-the-badge&logo=Ethereum&logoColor=EEEEEE
+[Viem-url]: https://viem.sh/
+[Prisma.io]: https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white
+[Prisma-url]: https://www.prisma.io/
+[Typescript]: https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white
+[Typescript-url]: https://www.typescriptlang.org/
+[PostgreSQL]: https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white
+[PostgreSQL-url]: https://www.postgresql.org/
