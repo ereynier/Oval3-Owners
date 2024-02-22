@@ -28,7 +28,7 @@ async function updateOwners(logs: any) {
         const to = transfer.to;
         const tokenId = transfer.tokenId;
         if (from !== to) {
-            saveTransfers(from, to, tokenId, prisma);
+            await saveTransfers(from, to, tokenId, prisma);
         }
         console.log("Transfer from", from, "to", to, "tokenId", tokenId);
     }

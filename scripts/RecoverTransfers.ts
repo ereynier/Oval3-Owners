@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client'
 
 import { client } from "./utils/client";
 import { saveTransfers } from './utils/SaveTransfers';
+import * as fs from 'fs';
 const Oval3Abi = require("./utils/abi/Oval3.abi.json");
 
 
@@ -17,7 +18,9 @@ async function getTransfers(fromBlock: number) {
     let toBlock = await client.getBlockNumber()
 
     let i = fromBlock
+    // get all transfers from the last checked block to the most recent one
     while (i < toBlock) {
+        console.log('Getting transfers from block', i, 'to', i + k)
         const logs = await client.getContractEvents({
             abi: Oval3Abi,
             address: CONTRACT_ADDRESS,
@@ -45,9 +48,10 @@ async function getTransfers(fromBlock: number) {
             const tokenId = Number(log.args.tokenId);
             // console.log(`From: ${from} To: ${to} TokenId: ${tokenId}`)
             if (from !== to) {
-                saveTransfers(from, to, tokenId, prisma);
+                await saveTransfers(from, to, tokenId, prisma);
             } 
         }
+        fs.writeFileSync(`../logs/recover.log`, `Block ${i} to ${i + k} - ${logs.length} transfers\n`, { flag: 'a' });
 
         i += k
         // update toBlock to the latest block
@@ -67,10 +71,11 @@ async function getTransfers(fromBlock: number) {
         })
 
         let fromBlock = 41250758; // 1 block before first Transfer of the contract 
-        // if (lastBlock) {
-        //     fromBlock = lastBlock.blockNumber //TODO: uncomment 
-        // }
+        if (lastBlock && lastBlock.blockNumber > fromBlock) {
+            fromBlock = lastBlock.blockNumber
+        }
 
+        console.log('Recovering transfers from block', fromBlock);
         // get all transfers from the contract
         getTransfers(fromBlock)
     }

@@ -140,6 +140,9 @@ You need to run `GetOwners.ts` once to fill the database and run `ListenOwners.t
 
 `ListenOwners.ts` will log the events it catches in `logs/transfers.log`.
 
+`RecoverTransfers.ts` is a script that browse all the events from the last block entered in the DB (or the first Transfer event of the smart contract) and push the NFT owners to the DB accordingly. It's useful if you need to restart `ListenOwners.ts` and it missed some events. It can also replace `GetOwners.ts` if you want to fill the database but it'll be much slower (about 7 days instead of 4 hours).
+
+
 Known issues:
 - The scripts can interfere with each other while they are running at the same time if the token `GetOwners.ts` is currently processing is transferred. It's not very likely to happen, but it's possible. However the error is not very important, and will be fixed if the card is transferred again later.
 - If `ListenOwners.ts` is stopped and restarted, it will not be able to catch up with the missed events. You will need to run `RecoverTransfer.ts` to fill the missing events and it will starts `ListenOwners.ts` again.
