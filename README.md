@@ -120,7 +120,7 @@ package manager:
    ```
 
 5. Run the listener in parallel
-   ```sh
+    ```sh
     cd scripts
     ts-node ListenOwners.ts
     ```
@@ -142,7 +142,10 @@ You need to run `GetOwners.ts` once to fill the database and run `ListenOwners.t
 
 Known issues:
 - The scripts can interfere with each other while they are running at the same time if the token `GetOwners.ts` is currently processing is transferred. It's not very likely to happen, but it's possible. However the error is not very important, and will be fixed if the card is transferred again later.
-- If `ListenOwners.ts` is stopped and restarted, it will not be able to catch up with the missed events. You will need to run `RecoverTransfer.ts` to fill the missing events in the database then start `LisListenOwners.ts` again.
+- If `ListenOwners.ts` is stopped and restarted, it will not be able to catch up with the missed events. You will need to run `RecoverTransfer.ts` to fill the missing events and it will starts `ListenOwners.ts` again.
+    ```sh
+    ts-node RecoverTransfer.ts && ts-node ListenOwners.ts
+    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
