@@ -14,6 +14,7 @@ const DOCKER = process.env.DOCKER || false
 const prisma = new PrismaClient()
 
 const projectRoot = path.resolve(__dirname, '../');
+const logsDir = path.join(projectRoot, 'logs');
 
 async function getTransfers(fromBlock: number) {
 
@@ -24,7 +25,7 @@ async function getTransfers(fromBlock: number) {
     // get all transfers from the last checked block to the most recent one
     while (i < toBlock) {
         if (DOCKER) {
-            fs.writeFileSync('/app/logs/recover.log', `     - Getting transfers from block ${i} to ${i + k}\n`, { flag: 'a' });
+            fs.writeFileSync(`${logsDir}/recover.log`, `     - Getting transfers from block ${i} to ${i + k}\n`, { flag: 'a' });
         } else {
             console.log('Getting transfers from block', i, 'to', i + k)
         }
@@ -58,7 +59,7 @@ async function getTransfers(fromBlock: number) {
                 await saveTransfers(from, to, tokenId, prisma);
             } 
         }
-        const logsDir = path.join(projectRoot, 'logs');
+        
         const date = new Date()
         fs.writeFileSync(`[${date}] - ${logsDir}/recover.log`, `Block ${i} to ${i + k} - ${logs.length} transfers\n`, { flag: 'a' });
 
@@ -89,7 +90,7 @@ async function getTransfers(fromBlock: number) {
 
         console.log('Recovering transfers from block', fromBlock);
         const date = new Date()
-        fs.writeFileSync('/app/logs/recover.log', `[${date}] - Recovering transfers from block ${fromBlock}\n`, { flag: 'a' });
+        fs.writeFileSync(`${logsDir}/recover.log`, `[${date}] - Recovering transfers from block ${fromBlock}\n`, { flag: 'a' });
         // get all transfers from the contract
         getTransfers(fromBlock)
     }

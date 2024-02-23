@@ -8,6 +8,7 @@ import * as path from 'path';
 const Oval3Abi = require("./utils/abi/Oval3.abi.json");
 
 const projectRoot = path.resolve(__dirname, '../');
+const logsDir = path.join(projectRoot, 'logs');
 
 const CONTRACT_ADDRESS = "0x83a5564378839EeF0721bc68A0fbeb92e2dE73d2"
 const DOCKER = process.env.DOCKER || false
@@ -65,7 +66,7 @@ async function getOwners(contractAddress: `0x${string}`, maxId = 0) {
         // owners[owner] = [...(owners[owner] || []), i];
         await saveOwner(owner, i);
         if (DOCKER) {
-            fs.writeFileSync('/app/logs/fill.log', `${((i / Number(totalSupply)) * 100).toFixed(0)} / 100 - ${i} / ${Number(totalSupply)}\n`, { flag: 'a' });
+            fs.writeFileSync(`${logsDir}/fill.log`, `${((i / Number(totalSupply)) * 100).toFixed(0)} / 100 - ${i} / ${Number(totalSupply)}\n`, { flag: 'a' });
         } else {
             console.log(`${((i / Number(totalSupply)) * 100).toFixed(0)} / 100 - ${i} / ${Number(totalSupply)}`)
         }
@@ -74,7 +75,6 @@ async function getOwners(contractAddress: `0x${string}`, maxId = 0) {
     const blockNb = await client.getBlockNumber();
     // const datas = { "block": Number(blockNb), "owners": owners }
     // fs.writeFileSync('./data.json', JSON.stringify(datas, null, 2), 'utf-8');
-    const logsDir = path.join(projectRoot, 'logs');
     fs.writeFileSync(`${logsDir}/fill.log`, `Finished at block ${blockNb}\n`, { flag: 'a' });
 }
 
