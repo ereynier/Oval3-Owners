@@ -1,14 +1,16 @@
 // checkAndRun.js
 const fs = require('fs');
 const { spawn } = require('child_process');
+require('dotenv').config();
 
 const DOCKER = process.env.DOCKER;
 
+if (DOCKER) {
+    console.log("The logs are in the container /usr/src/app/logs/")
+}
+
 fs.access('./logs/fill.log', fs.constants.F_OK, (err) => {
     let child;
-    if (DOCKER) {
-        console.log("The logs are in the container /usr/src/app/logs/")
-    }
     if (err) {
         console.log('Running GetOwners and EventListeners in parallel')
         // ./logs/fill.log does not exist, run GetOwners and EventListeners in parallel

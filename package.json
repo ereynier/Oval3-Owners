@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "prisma generate",
-    "start" : "node checkAndRun.js"
+    "start": "node checkAndRun.js"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +19,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "viem": "^2.7.11"
   }
 }
