@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client'
 import { client } from "./utils/client";
 import { saveTransfers } from './utils/SaveTransfers';
 import * as fs from 'fs';
+import * as path from 'path';
 const Oval3Abi = require("./utils/abi/Oval3.abi.json");
 
 
@@ -11,6 +12,7 @@ const CONTRACT_ADDRESS = "0x83a5564378839EeF0721bc68A0fbeb92e2dE73d2"
 
 const prisma = new PrismaClient()
 
+const projectRoot = path.resolve(__dirname, '../');
 
 async function getTransfers(fromBlock: number) {
 
@@ -51,7 +53,8 @@ async function getTransfers(fromBlock: number) {
                 await saveTransfers(from, to, tokenId, prisma);
             } 
         }
-        fs.writeFileSync(`../logs/recover.log`, `Block ${i} to ${i + k} - ${logs.length} transfers\n`, { flag: 'a' });
+        const logsDir = path.join(projectRoot, 'logs');
+        fs.writeFileSync(`${logsDir}/recover.log`, `Block ${i} to ${i + k} - ${logs.length} transfers\n`, { flag: 'a' });
 
         i += k
         // update toBlock to the latest block
@@ -62,6 +65,9 @@ async function getTransfers(fromBlock: number) {
 }
 
     async function main() {
+        if (!CONTRACT_ADDRESS) {
+            throw new Error('CONTRACT_ADDRESS is required')
+        }
 
         // get last block executed
         const lastBlock = await prisma.blocks.findFirst({

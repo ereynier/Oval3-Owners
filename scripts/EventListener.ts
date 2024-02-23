@@ -3,11 +3,14 @@ import { PrismaClient } from '@prisma/client'
 import { client } from "./utils/client";
 const Oval3Abi = require("./utils/abi/Oval3.abi.json");
 import * as fs from 'fs';
+import * as path from 'path';
 import { isAddress, zeroAddress } from "viem";
 import { saveTransfers } from './utils/SaveTransfers';
 // const ownersJSON = require("..//utils/datas/owners.json");
 
 const prisma = new PrismaClient()
+
+const projectRoot = path.resolve(__dirname, '../');
 
 const CONTRACT_ADDRESS = "0x83a5564378839EeF0721bc68A0fbeb92e2dE73d2"
 // const owners = { ...ownersJSON.owners } as { [key: `0x${string}`]: number[] };
@@ -30,11 +33,12 @@ async function updateOwners(logs: any) {
         if (from !== to) {
             await saveTransfers(from, to, tokenId, prisma);
         }
-        console.log("Transfer from", from, "to", to, "tokenId", tokenId);
+        // console.log("Transfer from", from, "to", to, "tokenId", tokenId);
     }
     const blockNb = await client.getBlockNumber();
     const date = new Date().toISOString();
-    fs.writeFileSync(`../logs/transfers.log`, `[${date}] - Block ${blockNb} - ${transfers.length} transfers\n`, { flag: 'a' });
+    const logsDir = path.join(projectRoot, 'logs');
+    fs.writeFileSync(`${logsDir}/events.log`, `[${date}] - Block ${blockNb} - ${transfers.length} transfers\n`, { flag: 'a' });
     const block = await prisma.blocks.update({
         where: {
             id: 1
@@ -67,7 +71,6 @@ async function main() {
     if (!isAddress(CONTRACT_ADDRESS)) {
         throw new Error('CONTRACT_ADDRESS is not a valid address')
     }
-
     console.log('Listening for Transfer events on contract', CONTRACT_ADDRESS);
     TransferListener(CONTRACT_ADDRESS);
 

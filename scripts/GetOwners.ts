@@ -3,8 +3,11 @@ import { PrismaClient } from '@prisma/client'
 
 import { client } from "./utils/client";
 import { argv } from "process";
+import * as fs from 'fs';
+import * as path from 'path';
 const Oval3Abi = require("./utils/abi/Oval3.abi.json");
 
+const projectRoot = path.resolve(__dirname, '../');
 
 const CONTRACT_ADDRESS = "0x83a5564378839EeF0721bc68A0fbeb92e2dE73d2"
 
@@ -66,6 +69,8 @@ async function getOwners(contractAddress: `0x${string}`, maxId = 0) {
     const blockNb = await client.getBlockNumber();
     // const datas = { "block": Number(blockNb), "owners": owners }
     // fs.writeFileSync('./data.json', JSON.stringify(datas, null, 2), 'utf-8');
+    const logsDir = path.join(projectRoot, 'logs');
+    fs.writeFileSync(`${logsDir}/fill.log`, `Finished at block ${blockNb}\n`, { flag: 'a' });
 }
 
 
@@ -73,7 +78,17 @@ async function getOwners(contractAddress: `0x${string}`, maxId = 0) {
 async function main() {
 
     const maxId = Number(argv[2]) || 0;
+    // If file `logs/fill.log` exists, don't execute the script
+    const logsDir = path.join(projectRoot, 'logs');
+    if (fs.existsSync(`${logsDir}/fill.log`)) {
+        console.log("Already executed");
+        return;
+    }
+    // DELETE ALL OWNERS FROM THE DATABASE
+    const owners = await prisma.owners.deleteMany({});
+    console.log("Deleted all owners", owners);
     getOwners(CONTRACT_ADDRESS, maxId);
+    
 }
 
 

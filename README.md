@@ -113,7 +113,7 @@ package manager:
    ```
 3. Fill the `.env` file based on the `.env.example` file
 
-4. Run the script
+4. Run the script. It will take about 4 hours to fill the database. THIS WILL CLEAR THE DATABASE.
    ```sh
    cd scripts
    ts-node GetOwners.ts
@@ -132,7 +132,7 @@ package manager:
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-`GetOwners.ts` use the `ownerOf` function from the smart contract to retrieves the owners of each OVAL3 NFTs and stores them in the database.
+`GetOwners.ts` use the `ownerOf` function from the smart contract to retrieves the owners of each OVAL3 NFTs and stores them in the database. The first thing it does is to clear the database. Then it fills it with the owners of the NFTs. It will take about 4 hours to fill the database.
 
 `ListenOwners.ts` listens to the blockchain for the `Transfer` event of the smart contract and updates the database accordingly.
 
@@ -142,6 +142,7 @@ You need to run `GetOwners.ts` once to fill the database and run `ListenOwners.t
 
 `RecoverTransfers.ts` is a script that browse all the events from the last block entered in the DB (or the first Transfer event of the smart contract) and push the NFT owners to the DB accordingly. It's useful if you need to restart `ListenOwners.ts` and it missed some events. It can also replace `GetOwners.ts` if you want to fill the database but it'll be much slower (about 7 days instead of 4 hours).
 
+`CheckAndRun.js` is a script that checks if the database is empty or not and runs the appropriate script. It's useful if you want to automate the process. It's used in the `start` script in `package.json`.
 
 Known issues:
 - The scripts can interfere with each other while they are running at the same time if the token `GetOwners.ts` is currently processing is transferred. It's not very likely to happen, but it's possible. However the error is not very important, and will be fixed if the card is transferred again later.
