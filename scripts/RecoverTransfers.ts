@@ -9,6 +9,7 @@ const Oval3Abi = require("./utils/abi/Oval3.abi.json");
 
 
 const CONTRACT_ADDRESS = "0x83a5564378839EeF0721bc68A0fbeb92e2dE73d2"
+const DOCKER = process.env.DOCKER || false
 
 const prisma = new PrismaClient()
 
@@ -22,7 +23,11 @@ async function getTransfers(fromBlock: number) {
     let i = fromBlock
     // get all transfers from the last checked block to the most recent one
     while (i < toBlock) {
-        console.log('Getting transfers from block', i, 'to', i + k)
+        if (DOCKER) {
+            fs.writeFileSync('/app/logs/recover.log', `     - Getting transfers from block ${i} to ${i + k}\n`, { flag: 'a' });
+        } else {
+            console.log('Getting transfers from block', i, 'to', i + k)
+        }
         const logs = await client.getContractEvents({
             abi: Oval3Abi,
             address: CONTRACT_ADDRESS,
@@ -54,7 +59,8 @@ async function getTransfers(fromBlock: number) {
             } 
         }
         const logsDir = path.join(projectRoot, 'logs');
-        fs.writeFileSync(`${logsDir}/recover.log`, `Block ${i} to ${i + k} - ${logs.length} transfers\n`, { flag: 'a' });
+        const date = new Date()
+        fs.writeFileSync(`[${date}] - ${logsDir}/recover.log`, `Block ${i} to ${i + k} - ${logs.length} transfers\n`, { flag: 'a' });
 
         i += k
         // update toBlock to the latest block
@@ -82,6 +88,8 @@ async function getTransfers(fromBlock: number) {
         }
 
         console.log('Recovering transfers from block', fromBlock);
+        const date = new Date()
+        fs.writeFileSync('/app/logs/recover.log', `[${date}] - Recovering transfers from block ${fromBlock}\n`, { flag: 'a' });
         // get all transfers from the contract
         getTransfers(fromBlock)
     }

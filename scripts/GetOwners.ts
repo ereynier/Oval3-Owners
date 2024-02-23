@@ -10,6 +10,7 @@ const Oval3Abi = require("./utils/abi/Oval3.abi.json");
 const projectRoot = path.resolve(__dirname, '../');
 
 const CONTRACT_ADDRESS = "0x83a5564378839EeF0721bc68A0fbeb92e2dE73d2"
+const DOCKER = process.env.DOCKER || false
 
 const prisma = new PrismaClient()
 
@@ -63,7 +64,11 @@ async function getOwners(contractAddress: `0x${string}`, maxId = 0) {
         }) as `0x${string}`;
         // owners[owner] = [...(owners[owner] || []), i];
         await saveOwner(owner, i);
-        console.log(`${((i / Number(totalSupply)) * 100).toFixed(0)} / 100 - ${i} / ${Number(totalSupply)}`)
+        if (DOCKER) {
+            fs.writeFileSync('/app/logs/fill.log', `${((i / Number(totalSupply)) * 100).toFixed(0)} / 100 - ${i} / ${Number(totalSupply)}\n`, { flag: 'a' });
+        } else {
+            console.log(`${((i / Number(totalSupply)) * 100).toFixed(0)} / 100 - ${i} / ${Number(totalSupply)}`)
+        }
     }
 
     const blockNb = await client.getBlockNumber();
