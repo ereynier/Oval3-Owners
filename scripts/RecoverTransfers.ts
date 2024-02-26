@@ -5,6 +5,7 @@ import { client } from "./utils/client";
 import { saveTransfers } from './utils/SaveTransfers';
 import * as fs from 'fs';
 import * as path from 'path';
+import dns from 'dns';
 const Oval3Abi = require("./utils/abi/Oval3.abi.json");
 
 
@@ -24,9 +25,7 @@ async function getTransfers(fromBlock: number) {
     let i = fromBlock
     // get all transfers from the last checked block to the most recent one
     while (i < toBlock) {
-        if (DOCKER) {
-            fs.writeFileSync(`${logsDir}/recover.log`, `     - Getting transfers from block ${i} to ${i + k}\n`, { flag: 'a' });
-        } else {
+        if (!DOCKER) {
             console.log('Getting transfers from block', i, 'to', i + k)
         }
         const logs = await client.getContractEvents({
@@ -49,7 +48,7 @@ async function getTransfers(fromBlock: number) {
             transactionIndex: number
         }[]
 
-
+        const transfersList : {from: string, to: string, tokenId: number}[] = []
         for (let log of logs) {
             const from = log.args.from;
             const to = log.args.to;
@@ -57,11 +56,11 @@ async function getTransfers(fromBlock: number) {
             // console.log(`From: ${from} To: ${to} TokenId: ${tokenId}`)
             if (from !== to) {
                 await saveTransfers(from, to, tokenId, prisma);
+                transfersList.push({ from, to, tokenId })
             } 
         }
-        
         const date = new Date()
-        fs.writeFileSync(`[${date}] - ${logsDir}/recover.log`, `Block ${i} to ${i + k} - ${logs.length} transfers\n`, { flag: 'a' });
+        fs.writeFileSync(`${logsDir}/recover.log`, `    - [${date.toISOString()}] - Block ${i} to ${i + k}\n${transfersList.map(transfer => {return `        - From: ${transfer.from} To: ${transfer.to} TokenId: ${transfer.tokenId}`}).join('\n')}\n`, { flag: 'a' });
 
         i += k
         // update toBlock to the latest block
@@ -90,9 +89,18 @@ async function getTransfers(fromBlock: number) {
 
         console.log('Recovering transfers from block', fromBlock);
         const date = new Date()
-        fs.writeFileSync(`${logsDir}/recover.log`, `[${date}] - Recovering transfers from block ${fromBlock}\n`, { flag: 'a' });
+        fs.writeFileSync(`${logsDir}/recover.log`, `[INFO] - [${date.toISOString()}] - Recovering transfers from block ${fromBlock}\n`, { flag: 'a' });
         // get all transfers from the contract
         getTransfers(fromBlock)
+        setInterval(() => {
+            // console.log('Checking internet connection');
+            dns.lookup('google.com', (err) => {
+                if (err && err.code == "ENOTFOUND") {
+                    fs.writeFileSync(`${logsDir}/recover.log`, `[ERROR] - [${date.toISOString()}] - No internet connection \n`, { flag: 'a' });
+                    throw new Error('No internet connection');
+                }
+            });
+        }, 5000);
     }
 
 
