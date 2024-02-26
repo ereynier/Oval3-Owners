@@ -5,6 +5,7 @@ import { client } from "./utils/client";
 import { argv } from "process";
 import * as fs from 'fs';
 import * as path from 'path';
+import dns from 'dns';
 const Oval3Abi = require("./utils/abi/Oval3.abi.json");
 
 const projectRoot = path.resolve(__dirname, '../');
@@ -67,6 +68,7 @@ async function getOwners(contractAddress: `0x${string}`, maxId = 0) {
         await saveOwner(owner, i);
         if (DOCKER) {
             fs.writeFileSync(`${logsDir}/fill.log`, `${((i / Number(totalSupply)) * 100).toFixed(0)} / 100 - ${i} / ${Number(totalSupply)}\n`, { flag: 'a' });
+            fs.writeFileSync(`${logsDir}/getOwners.log`, `${owner}, ${i}\n`, { flag: 'a' });
         } else {
             console.log(`${((i / Number(totalSupply)) * 100).toFixed(0)} / 100 - ${i} / ${Number(totalSupply)}`)
         }
@@ -93,6 +95,18 @@ async function main() {
     const owners = await prisma.owners.deleteMany({});
     console.log("Deleted all owners", owners);
     getOwners(CONTRACT_ADDRESS, maxId);
+
+    setInterval(() => {
+        // console.log('Checking internet connection');
+        dns.lookup('google.com', (err) => {
+            if (err && err.code == "ENOTFOUND") {
+                const date = new Date().toISOString()
+                fs.writeFileSync(`${logsDir}/getOwners.log`, `[ERROR] - [${date}] - No internet connection \n`, { flag: 'a' });
+                fs.writeFileSync(`${logsDir}/fill.log`, `[ERROR] - [${date}] - No internet connection \n`, { flag: 'a' });
+                throw new Error('No internet connection');
+            }
+        });
+    }, 5000);
     
 }
 
