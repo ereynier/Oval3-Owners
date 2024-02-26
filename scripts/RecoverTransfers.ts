@@ -59,8 +59,8 @@ async function getTransfers(fromBlock: number) {
                 transfersList.push({ from, to, tokenId })
             } 
         }
-        const date = new Date()
-        fs.writeFileSync(`${logsDir}/recover.log`, `    - [${date.toISOString()}] - Block ${i} to ${i + k}\n${transfersList.map(transfer => {return `        - From: ${transfer.from} To: ${transfer.to} TokenId: ${transfer.tokenId}`}).join('\n')}\n`, { flag: 'a' });
+        const date = new Date().toISOString()
+        fs.writeFileSync(`${logsDir}/recover.log`, `    - [${date}] - Block ${i} to ${i + k}\n${transfersList.map(transfer => {return `        - From: ${transfer.from} To: ${transfer.to} TokenId: ${transfer.tokenId}`}).join('\n')}\n`, { flag: 'a' });
 
         i += k
         // update toBlock to the latest block
