@@ -35,7 +35,7 @@ export const saveTransfers = async (from: string, to: string, tokenId: number, p
             },
             data: {
                 nfts: {
-                    set: [...toOwner.nfts, tokenId]
+                    set: [...new Set([...toOwner.nfts, tokenId])]
                 }
             }
         })
