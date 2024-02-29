@@ -96,6 +96,16 @@ async function main() {
     console.log("Deleted all owners", owners);
     getOwners(CONTRACT_ADDRESS, maxId);
 
+    const blocks = await prisma.blocks.deleteMany({});
+    console.log("Deleted all blocks", blocks);
+    const block = await prisma.blocks.create({
+        data: {
+            blockNumber: Number(client.getBlockNumber()),
+            id: 1,
+            updatedAt: new Date()
+        }
+    });
+
     setInterval(() => {
         // console.log('Checking internet connection');
         dns.lookup('google.com', (err) => {
@@ -103,6 +113,7 @@ async function main() {
                 const date = new Date().toISOString()
                 fs.writeFileSync(`${logsDir}/getOwners.log`, `[ERROR] - [${date}] - No internet connection \n`, { flag: 'a' });
                 fs.writeFileSync(`${logsDir}/fill.log`, `[ERROR] - [${date}] - No internet connection \n`, { flag: 'a' });
+                console.error('No internet connection, stopping GetOwners script');
                 throw new Error('No internet connection');
             }
         });

@@ -73,6 +73,7 @@ async function TransferListener(contractAddress: `0x${string}`) {
                 unwatch(); // Stop watching the contract event
                 const date = new Date().toISOString();
                 fs.writeFileSync(`${logsDir}/recover.log`, `[ERROR] - [${date}] - No internet connection \n`, { flag: 'a' });
+                console.log('No internet connection, stopping EventListener script');
                 throw new Error('No internet connection');
             }
         });
