@@ -100,7 +100,7 @@ async function main() {
     console.log("Deleted all blocks", blocks);
     const block = await prisma.blocks.create({
         data: {
-            blockNumber: Number(client.getBlockNumber()),
+            blockNumber: Number(await client.getBlockNumber()),
             id: 1,
             updatedAt: new Date()
         }
