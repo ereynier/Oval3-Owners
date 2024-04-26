@@ -91,8 +91,8 @@ async function getTransfers(fromBlock: number) {
         const date = new Date()
         fs.writeFileSync(`${logsDir}/recover.log`, `[INFO] - [${date.toISOString()}] - Recovering transfers from block ${fromBlock}\n`, { flag: 'a' });
         // get all transfers from the contract
-        getTransfers(fromBlock)
-        setInterval(() => {
+        const getTransferPromise = getTransfers(fromBlock)
+        const internetCheckerInterval = setInterval(() => {
             // console.log('Checking internet connection');
             dns.lookup('google.com', (err) => {
                 if (err && err.code == "ENOTFOUND") {
@@ -102,6 +102,9 @@ async function getTransfers(fromBlock: number) {
                 }
             });
         }, 5000);
+
+        await getTransferPromise
+        clearInterval(internetCheckerInterval)
     }
 
 
