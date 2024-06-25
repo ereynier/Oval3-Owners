@@ -18,3 +18,70 @@ model Owners {
   address String @id @unique
   nfts    Int[]
 }
+
+model Card {
+  owner             String
+  rarity            String?
+  tokenId           String   @id @unique
+  opta_id           String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime
+  max_serial_Number Decimal?
+  serial_Number     Decimal?
+  academy           Boolean?
+  age               Int?
+  clubCode          String?
+  clubName          String?
+  competition       String?
+  image             String?
+  international     Boolean?
+  name              String?
+  nationality       String?
+  position          String?
+  season            String?
+  Player            Player?  @relation(fields: [opta_id], references: [opta_id])
+}
+
+model Game {
+  id             String   @id @unique @default(uuid())
+  attack         Decimal?
+  game_date      String?
+  impact         Decimal?
+  metadata_total Decimal?
+  skills         Decimal?
+  strength       Decimal?
+  playerOpta_id  String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime
+  defense        Decimal?
+  Player         Player   @relation(fields: [playerOpta_id], references: [opta_id])
+}
+
+model Player {
+  opta_id              String   @id @unique
+  appearances          Int?
+  attack               Decimal?
+  evolution            Decimal?
+  impact               Decimal?
+  last_scoring         Decimal?
+  minutes_played_total Decimal?
+  red_cards            Int?
+  scoring              Decimal?
+  skills               Decimal?
+  strength             Decimal?
+  tries                Int?
+  yellow_cards         Int?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime
+  defense              Decimal?
+  Card                 Card[]
+  Game                 Game[]
+}
+
+model feedbacks {
+  id        String   @id
+  message   String
+  type      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+}

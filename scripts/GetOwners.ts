@@ -6,6 +6,8 @@ import { argv } from "process";
 import * as fs from 'fs';
 import * as path from 'path';
 import dns from 'dns';
+import { saveTransfers } from './utils/SaveTransfers';
+import { zeroAddress } from 'viem';
 const Oval3Abi = require("./utils/abi/Oval3.abi.json");
 
 const projectRoot = path.resolve(__dirname, '../');
@@ -17,29 +19,7 @@ const DOCKER = process.env.DOCKER || false
 const prisma = new PrismaClient()
 
 async function saveOwner(owner: `0x${string}`, tokenId: number) {
-    const ownerData = await prisma.owners.findUnique({
-        where: {
-            address: owner
-        }
-    })
-    // update or create owner in DB
-    if (ownerData) {
-        await prisma.owners.update({
-            where: {
-                address: owner
-            },
-            data: {
-                nfts: [...ownerData.nfts, tokenId]
-            }
-        })
-    } else {
-        await prisma.owners.create({
-            data: {
-                address: owner,
-                nfts: [tokenId]
-            }
-        })
-    }
+    saveTransfers(zeroAddress, owner, tokenId, prisma);
 }
 
 async function getOwners(contractAddress: `0x${string}`, maxId = 0) {
@@ -92,12 +72,19 @@ async function main() {
         return;
     }
     // DELETE ALL OWNERS FROM THE DATABASE
-    const owners = await prisma.owners.deleteMany({});
-    console.log("Deleted all owners", owners);
-    getOwners(CONTRACT_ADDRESS, maxId);
+    // const owners = await prisma.owners.deleteMany({});
+    // console.log("Deleted all owners", owners);
 
     const blocks = await prisma.blocks.deleteMany({});
     console.log("Deleted all blocks", blocks);
+    
+    const cards = await prisma.card.deleteMany({});
+    console.log("Deleted all cards", cards);
+    const game = await prisma.game.deleteMany({});
+    console.log("Deleted all games", game);
+    const player = await prisma.player.deleteMany({});
+    console.log("Deleted all players", player);
+    
     const block = await prisma.blocks.create({
         data: {
             blockNumber: Number(await client.getBlockNumber()),
@@ -106,7 +93,7 @@ async function main() {
         }
     });
 
-    setInterval(() => {
+    const checkInternetInterval = setInterval(() => {
         // console.log('Checking internet connection');
         dns.lookup('google.com', (err) => {
             if (err && err.code == "ENOTFOUND") {
@@ -118,7 +105,11 @@ async function main() {
             }
         });
     }, 5000);
-    
+
+    await getOwners(CONTRACT_ADDRESS, maxId).finally(() => {
+        clearInterval(checkInternetInterval);
+    })
+
 }
 
 
