@@ -96,8 +96,9 @@ async function getTransfers(fromBlock: number) {
             // console.log('Checking internet connection');
             dns.lookup('google.com', (err) => {
                 if (err) {
-                    fs.writeFileSync(`${logsDir}/recover.log`, `[ERROR] - [${date.toISOString()}] - No internet connection \n`, { flag: 'a' });
+                    fs.writeFileSync(`${logsDir}/recover.log`, `[ERROR] - [${date.toISOString()}] - No internet connection: ${err} \n`, { flag: 'a' });
                     console.error('No internet connection, stopping RecoverTransfers script');
+                    console.error(err)
                     throw new Error('No internet connection');
                 }
             });

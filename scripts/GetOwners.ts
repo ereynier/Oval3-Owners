@@ -111,9 +111,10 @@ async function main() {
         dns.lookup('google.com', (err) => {
             if (err) {
                 const date = new Date().toISOString()
-                fs.writeFileSync(`${logsDir}/getOwners.log`, `[ERROR] - [${date}] - No internet connection \n`, { flag: 'a' });
-                fs.writeFileSync(`${logsDir}/fill.log`, `[ERROR] - [${date}] - No internet connection \n`, { flag: 'a' });
+                fs.writeFileSync(`${logsDir}/getOwners.log`, `[ERROR] - [${date}] - No internet connection: ${err} \n`, { flag: 'a' });
+                fs.writeFileSync(`${logsDir}/fill.log`, `[ERROR] - [${date}] - No internet connection: ${err} \n`, { flag: 'a' });
                 console.error('No internet connection, stopping GetOwners script');
+                console.error(err)
                 throw new Error('No internet connection');
             }
         });
