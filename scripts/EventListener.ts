@@ -69,7 +69,7 @@ async function TransferListener(contractAddress: `0x${string}`) {
     setInterval(() => {
         // console.log('Checking internet connection');
         dns.lookup('google.com', (err) => {
-            if (err && err.code == "ENOTFOUND") {
+            if (err) {
                 unwatch(); // Stop watching the contract event
                 const date = new Date().toISOString();
                 fs.writeFileSync(`${logsDir}/recover.log`, `[ERROR] - [${date}] - No internet connection \n`, { flag: 'a' });

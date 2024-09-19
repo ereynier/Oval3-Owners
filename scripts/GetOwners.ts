@@ -109,7 +109,7 @@ async function main() {
     setInterval(() => {
         // console.log('Checking internet connection');
         dns.lookup('google.com', (err) => {
-            if (err && err.code == "ENOTFOUND") {
+            if (err) {
                 const date = new Date().toISOString()
                 fs.writeFileSync(`${logsDir}/getOwners.log`, `[ERROR] - [${date}] - No internet connection \n`, { flag: 'a' });
                 fs.writeFileSync(`${logsDir}/fill.log`, `[ERROR] - [${date}] - No internet connection \n`, { flag: 'a' });
